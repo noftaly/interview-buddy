@@ -6,9 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Send } from 'lucide-react';
 import { useChat } from 'ai/react';
 import Markdown from 'react-markdown';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function ChatInterface() {
-  const { messages, setMessages, input, handleInputChange, handleSubmit } = useChat();
+  const queryClient = useQueryClient();
+  const { messages, setMessages, input, handleInputChange, handleSubmit } = useChat({
+    onToolCall: async ({ toolCall }) => {
+      if (toolCall.toolName === 'upsertApplication') {
+        queryClient.refetchQueries(['jobs']);
+      }
+    },
+  });
 
   useEffect(() => {
     const storedMessages = localStorage.getItem('chatMessages');

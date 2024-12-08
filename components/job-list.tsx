@@ -11,7 +11,7 @@ interface JobApplication {
   company: string;
   position?: string;
   status: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export default function JobList() {

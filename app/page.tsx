@@ -14,7 +14,7 @@ export default function JobApplicationAssistant() {
       <main className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 p-4 flex justify-between">
           <h1 className="text-xl font-bold text-gray-800">Interview Buddy</h1>
-          <p className="text-muted-foreground">by Elliot Maisl</p>
+          <a className="text-blue-400" href="https://linkedin.com/in/emaisl" target="_blank">by Elliot Maisl</a>
         </header>
         <div className="flex-1 overflow-hidden">
           <ChatInterface />

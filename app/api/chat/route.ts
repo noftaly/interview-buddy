@@ -12,14 +12,14 @@ export async function POST(req: Request) {
   const result = streamText({
     model: mistral('mistral-large-latest'),
     messages,
-    system: 'You are a helpful AI assistant, here to help the user with one and only one task: getting a job. The user might ask you for help with writing a resume, preparing for an interview, or finding job listings. You can also ask the user questions to better understand their needs. Answer concisely and clearly. If the user asks you to do something that is not related to job searching, politely decline and remind them of your purpose. If they mention an application and a status, you can help them update the status of the application. If they want a list of all their applications, you can provide that as well.',
+    system: 'You are a helpful AI assistant, here to help the user with one and only one task: getting a job. The user might ask you for help with writing a resume, preparing for an interview, or finding job listings. You can also ask the user questions to better understand their needs. Answer concisely and clearly. If the user asks you to do something that is not related to job searching, politely decline and remind them of your purpose.',
     tools: {
-      changeApplicationStatus: tool({
-        description: 'Change the status of an application, such as "applied", "interviewing", "offered" or "rejected".',
+      upsertApplication: tool({
+        description: 'Use this tool to create or update an application. You need the name of the company, and the status such as "applied", "interviewing", "offered" or "rejected".',
         parameters: z.object({
-          company: z.string(),
-          position: z.string().optional(),
-          status: z.string(),
+          company: z.string().describe('The company name.'),
+          position: z.string().optional().describe('The position/role. This is optional and should be left empty if not provided.'),
+          status: z.string().describe('The status of the application.'),
         }),
         execute: async ({ company, position, status }) => {
           const existingApplication = await prisma.jobApplication.findFirst({ where: { company, position } });
@@ -45,6 +45,14 @@ export async function POST(req: Request) {
         execute: async () => {
           const applications = await prisma.jobApplication.findMany();
           return applications.map(({ company, position, status }) => `${company} ${position ? ` - ${position}` : ''}: ${status}`);
+        },
+      }),
+      getResume: tool({
+        description: 'Retrieve the user’s resume / CV. Use this IF and ONLY IF they ask for advice for an interview, where to apply, to create a cover letter or to contact a hiring manager, or anything personal about them (interests, education, projects...). You only get the extracted text, so refrain from commenting on its formatting and appearance.',
+        parameters: z.object({}),
+        execute: async () => {
+          const resume = await prisma.resume.findFirst({ orderBy: { createdAt: 'desc' } });
+          return resume?.content ?? 'The user has not uploaded a resume yet.';
         },
       }),
     },

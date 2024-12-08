@@ -37,3 +37,16 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the chat app!
+
+## Explanations
+
+This project uses Next.js, Prisma, and Tailwind CSS.\
+The chat app is built on the Mistral public API. We use Vercel’s `ai` package to interact with the API
+and stream the conversation in real-time.
+
+We have 3 tools available to the LLM:
+- Upsert an application
+- Get a list of applications
+- Get the user’s resume
+
+The app doesn't have authentication, and is meant to be used by a single user, in localhost.
